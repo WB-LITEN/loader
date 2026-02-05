@@ -1,18 +1,26 @@
--- [[ Smart Loader: Arsenal & UBG ]] --
+-- [[ DASH HUB LOADER - FIX FINAL ]] --
 
-local placeId = game.PlaceId
+-- 1. Ativa as variáveis para o script não fechar sozinho
+getgenv().DashHub_Auth_Verified = true
+getgenv().DashHub_ExecutadoPeloLoader = true
+_G.DashHub_Auth_Verified = true
+_G.DashHub_ExecutadoPeloLoader = true
 
-if placeId == 286090429 then
-    -- SE FOR ARSENAL
-    print("Jogo detectado: Arsenal. Carregando Script...")
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/WB-LITEN/dash-hub-script-arsenal/main/Source.lua"))()
+-- 2. Função que baixa e LIMPA o código antes de rodar
+local function ForcaBrutaLoad(url, nomeJogo)
+    print("[...] Tentando carregar: " .. nomeJogo)
+    
+    local success, content = pcall(function()
+        return game:HttpGet(url)
+    end)
 
-elseif placeId == 11815767793 then
-    -- SE FOR UBG (Untitled Boxing Game)
-    print("Jogo detectado: UBG. Carregando Script...")
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/WB-LITEN/Dash-Hub-BETA/main/Dash%20Hub%20BETA"))()
+    if not success then
+        warn("❌ Erro de Rede: Não foi possível baixar o script do " .. nomeJogo)
+        return
+    end
 
-else
-    -- SE NÃO FOR NENHUM DOS DOIS
-    warn("ERRO: Este script não é compatível com este jogo (ID: " .. placeId .. ")")
-end
+    -- LIMPEZA AUTOMÁTICA DE LIXO DO GITHUB
+    -- Remove cabeçalhos de README (# Titulo)
+    local cleanCode = content:gsub("^#.-\n", "")
+    -- Remove blocos de código markdown (```lua ... ```)
+    cleanCode = cleanCode:gsub("
